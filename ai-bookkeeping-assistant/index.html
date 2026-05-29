@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0f172a" />
+    <title>AI Bookkeeping Assistant</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Drive PDF → categorised insights</p>
+          <h1>AI Bookkeeping Assistant</h1>
+          <p class="hero-copy">Log statements from any account, categorise spending, review uncertain items, and approve rules that make the next import smarter.</p>
+        </div>
+        <button class="ghost-button" id="resetDemoButton" type="button">Reset demo</button>
+      </header>
+
+      <main>
+        <section class="panel active" id="dashboardPanel" data-panel="dashboard">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Overview</p>
+              <h2>Spending insights</h2>
+            </div>
+            <span class="pill" id="syncStatus">Local-first MVP</span>
+          </div>
+
+          <div class="metric-grid" aria-label="Spending summary">
+            <article class="metric-card">
+              <span>Total spend</span>
+              <strong id="expenseMetric">$0.00</strong>
+            </article>
+            <article class="metric-card">
+              <span>Business spend</span>
+              <strong id="businessMetric">$0.00</strong>
+            </article>
+            <article class="metric-card">
+              <span>Personal spend</span>
+              <strong id="personalMetric">$0.00</strong>
+            </article>
+            <article class="metric-card warning">
+              <span>Needs review</span>
+              <strong id="reviewMetric">0</strong>
+            </article>
+          </div>
+
+          <article class="card">
+            <div class="card-header">
+              <h3>Top categories</h3>
+              <span id="transactionCount">0 transactions</span>
+            </div>
+            <div class="bar-list" id="categoryBars"></div>
+          </article>
+        </section>
+
+        <section class="panel" id="inboxPanel" data-panel="inbox">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Step 1</p>
+              <h2>Upload statement PDFs</h2>
+            </div>
+          </div>
+
+          <article class="card upload-card">
+            <label class="drop-zone" for="statementUpload">
+              <input id="statementUpload" type="file" accept="application/pdf,.pdf" multiple />
+              <span class="drop-icon">⇧</span>
+              <strong>Choose PDFs from any account</strong>
+              <small>Each file is logged immediately. Connect your parser webhook in settings when you are ready for live extraction.</small>
+            </label>
+          </article>
+
+          <article class="card">
+            <div class="card-header">
+              <h3>Statement log</h3>
+              <span id="statementCount">0 PDFs</span>
+            </div>
+            <div class="list" id="statementList"></div>
+          </article>
+        </section>
+
+        <section class="panel" id="importPanel" data-panel="import">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Step 2</p>
+              <h2>Import extracted rows</h2>
+            </div>
+          </div>
+
+          <article class="card">
+            <label for="accountName">Account label</label>
+            <input id="accountName" type="text" value="Uploaded Account" />
+
+            <label for="csvInput">Paste parser output as CSV</label>
+            <textarea id="csvInput" rows="9" spellcheck="false" placeholder="date,description,amount,account&#10;2026-05-01,AWS AMAZON WEB SERVICES,-42.19,Business Card"></textarea>
+
+            <div class="button-row">
+              <button id="loadSampleButton" type="button" class="secondary-button">Load sample</button>
+              <button id="importRowsButton" type="button">Categorise rows</button>
+            </div>
+            <p class="helper-text">This MVP accepts CSV from Parseur, Nanonets, Make.com, Zapier, or a bank export. Duplicates are ignored using account + date + amount + description.</p>
+          </article>
+        </section>
+
+        <section class="panel" id="reviewPanel" data-panel="review">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Step 3</p>
+              <h2>Review & teach</h2>
+            </div>
+            <button class="secondary-button" id="approveAllButton" type="button">Approve high confidence</button>
+          </div>
+          <div class="list" id="reviewList"></div>
+        </section>
+
+        <section class="panel" id="rulesPanel" data-panel="rules">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Learning memory</p>
+              <h2>Approved merchant rules</h2>
+            </div>
+          </div>
+          <article class="card compact-form">
+            <input id="ruleMatch" type="text" placeholder="Merchant contains, e.g. FIGMA" />
+            <select id="ruleCategory"></select>
+            <select id="ruleContext">
+              <option>Business</option>
+              <option>Personal</option>
+              <option>Mixed</option>
+              <option>Needs Review</option>
+            </select>
+            <button id="addRuleButton" type="button">Add rule</button>
+          </article>
+          <div class="list" id="ruleList"></div>
+        </section>
+
+        <section class="panel" id="settingsPanel" data-panel="settings">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Automation</p>
+              <h2>Parser & LLM settings</h2>
+            </div>
+          </div>
+          <article class="card">
+            <label for="webhookUrl">Make/Zapier parser webhook URL</label>
+            <input id="webhookUrl" type="url" placeholder="https://hook.make.com/..." />
+            <label for="llmProvider">LLM provider note</label>
+            <input id="llmProvider" type="text" placeholder="OpenAI, Claude, or routed through automation" />
+            <button id="saveSettingsButton" type="button">Save settings</button>
+            <p class="helper-text">The UI is intentionally portable: run it as a static PWA, connect Google Drive through Make.com/Zapier, and post extracted rows back as CSV or JSON.</p>
+          </article>
+        </section>
+      </main>
+
+      <nav class="bottom-nav" aria-label="Primary navigation">
+        <button class="active" data-target="dashboard" type="button">Insights</button>
+        <button data-target="inbox" type="button">Inbox</button>
+        <button data-target="import" type="button">Import</button>
+        <button data-target="review" type="button">Review</button>
+        <button data-target="rules" type="button">Rules</button>
+        <button data-target="settings" type="button">Settings</button>
+      </nav>
+    </div>
+
+    <template id="transactionTemplate">
+      <article class="card transaction-card">
+        <div class="transaction-topline">
+          <div>
+            <strong class="merchant"></strong>
+            <small class="description"></small>
+          </div>
+          <strong class="amount"></strong>
+        </div>
+        <div class="chips"></div>
+        <p class="justification"></p>
+        <div class="edit-grid">
+          <select class="category-select"></select>
+          <select class="context-select">
+            <option>Business</option>
+            <option>Personal</option>
+            <option>Mixed</option>
+            <option>Needs Review</option>
+          </select>
+          <select class="deductibility-select">
+            <option>100%</option>
+            <option>Partial</option>
+            <option>0%</option>
+            <option>Unknown</option>
+          </select>
+        </div>
+        <label class="inline-check">
+          <input class="learn-rule" type="checkbox" checked />
+          Learn this correction as an approved merchant rule
+        </label>
+        <div class="button-row">
+          <button class="save-transaction" type="button">Save correction</button>
+          <button class="secondary-button mark-reviewed" type="button">Mark reviewed</button>
+        </div>
+      </article>
+    </template>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "ai-bookkeeping-assistant",
+  "version": "0.1.0",
+  "description": "Mobile-first PWA MVP for AI-assisted PDF bookkeeping intake, categorisation, review, and learned merchant rules.",
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 4173",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "keywords": [
+    "bookkeeping",
+    "pwa",
+    "personal-finance",
+    "automation"
+  ],
+  "license": "MIT"
+}
