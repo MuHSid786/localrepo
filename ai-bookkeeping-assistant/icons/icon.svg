@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="AI Bookkeeping Assistant icon">
+  <defs>
+    <linearGradient id="g" x1="12" x2="116" y1="12" y2="116" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="30" fill="url(#g)"/>
+  <path fill="#fff" d="M33 30h43l19 19v49H33z" opacity=".96"/>
+  <path fill="#bfdbfe" d="M76 30v20h19z"/>
+  <path fill="#2563eb" d="M45 61h38v8H45zm0 17h28v8H45z"/>
+  <circle cx="87" cy="86" r="18" fill="#22c55e"/>
+  <path fill="#fff" d="m78 86 6 6 12-15 5 4-16 21-12-12z"/>
+</svg>

@@ -1,0 +1,21 @@
+{
+  "name": "AI Bookkeeping Assistant",
+  "short_name": "Bookkeeping AI",
+  "description": "Mobile-first assistant for PDF statement logging, transaction categorisation, review, and learned spending rules.",
+  "id": "/ai-bookkeeping-assistant/",
+  "start_url": ".",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#eef2ff",
+  "theme_color": "#0f172a",
+  "categories": ["finance", "productivity", "business"],
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
