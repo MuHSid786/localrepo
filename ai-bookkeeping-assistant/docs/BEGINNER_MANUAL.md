@@ -32,14 +32,36 @@ Then open this address in your browser:
 http://localhost:4173
 ```
 
-If you are on a phone, host the app on a reachable machine or static web host, then open that URL in your mobile browser.
+If you are on a phone, open the app once from a reachable local machine or static web location. After you install it to the home screen, the app shell can open as a standalone app without keeping that original host running. Internet is still needed for Google Drive, parser webhooks, and AI/automation calls.
 
-## 3. Learn the Main Tabs
+## 3. Install It as a Standalone Mobile App
 
-The bottom navigation has six tabs:
+The **Setup** tab guides you through installation.
+
+### Android Chrome
+
+1. Open the app URL in Chrome.
+2. Tap **Install app** in the app header, or open the Chrome menu and tap **Add to Home screen**.
+3. Confirm the install.
+4. Open **Bookkeeping AI** from the home screen.
+
+### iPhone Safari
+
+1. Open the app URL in Safari.
+2. Tap the Share button.
+3. Tap **Add to Home Screen**.
+4. Confirm the name and tap **Add**.
+5. Open **Bookkeeping AI** from the home screen.
+
+Once installed, the interface loads from the phone like an app. Uploading PDFs to automations, opening Google, and using parser/LLM services still require internet.
+
+## 4. Learn the Main Tabs
+
+The bottom navigation has seven tabs:
 
 | Tab | What It Is For |
 | --- | --- |
+| **Setup** | Guides mobile install, Google Drive folder setup, parser webhook setup, and LLM route setup. |
 | **Insights** | Shows total spend, business spend, personal spend, transactions needing review, and top categories. |
 | **Inbox** | Uploads and logs statement PDFs from any account. |
 | **Import** | Accepts extracted transaction rows as CSV. |
@@ -47,7 +69,7 @@ The bottom navigation has six tabs:
 | **Rules** | Shows approved merchant rules and lets you add or delete rules. |
 | **Settings** | Saves parser webhook and LLM provider notes. |
 
-## 4. First-Time Demo Without Any Real Bank Data
+## 5. First-Time Demo Without Any Real Bank Data
 
 Use this path to safely test the app:
 
@@ -61,7 +83,7 @@ Use this path to safely test the app:
 8. Tap **Save correction**.
 9. Open the **Rules** tab to see the new learned rule.
 
-## 5. Upload a Statement PDF
+## 6. Upload a Statement PDF
 
 1. Open the **Inbox** tab.
 2. Tap **Choose PDFs from any account**.
@@ -70,9 +92,9 @@ Use this path to safely test the app:
 
 If no webhook is configured, the app still logs the PDF metadata locally. This is useful while testing.
 
-## 6. Connect a Parser Automation
+## 7. Connect Google Drive and Parser Automation
 
-The MVP does not directly read the PDF itself. It is designed to hand PDFs to an automation service.
+The MVP does not directly read the PDF itself. It is designed to hand PDFs to an automation service. Start in **Setup** and save your Google account email, Drive folder URL, parser provider, webhook URL, and LLM route.
 
 A simple automation setup is:
 
@@ -89,11 +111,12 @@ Optional direct-upload flow:
 2. Send the uploaded file to Parseur, Nanonets, or another document parser.
 3. Copy the webhook URL.
 4. Open **Settings** in the app.
-5. Paste the URL into **Make/Zapier parser webhook URL**.
-6. Tap **Save settings**.
-7. Upload a PDF in **Inbox** and confirm the status changes to **Sent to parser** or **Parser error**.
+5. Paste the URL into **Make/Zapier parser webhook URL** in **Setup**.
+6. Choose the parser and LLM route.
+7. Tap **Save connections**.
+8. Upload a PDF in **Inbox** and confirm the status changes to **Sent to parser** or **Parser error**.
 
-## 7. Import Extracted CSV Rows
+## 8. Import Extracted CSV Rows
 
 Open **Import** and paste rows like this:
 
@@ -122,7 +145,7 @@ Supported column names include:
 
 The app ignores duplicates using account, date, amount, and description.
 
-## 8. Review and Teach the Assistant
+## 9. Review and Teach the Assistant
 
 The **Review** tab is where accuracy improves.
 
@@ -145,7 +168,7 @@ If you change `FIGMA DESIGN` to:
 
 The app can create a rule so future `FIGMA DESIGN` rows are classified automatically.
 
-## 9. Add Rules Manually
+## 10. Add Rules Manually
 
 Use this when you already know a merchant should always be categorised a certain way.
 
@@ -157,7 +180,7 @@ Use this when you already know a merchant should always be categorised a certain
 
 Rules are applied before the built-in heuristics, so your rules take priority.
 
-## 10. Common Troubleshooting
+## 11. Common Troubleshooting
 
 | Problem | What To Try |
 | --- | --- |
@@ -168,11 +191,11 @@ Rules are applied before the built-in heuristics, so your rules take priority.
 | Amount signs look wrong | Make sure expenses are negative, or use debit/credit columns. |
 | Data disappeared | The MVP uses browser localStorage. Do not clear site data unless you want to reset. |
 
-## 11. Reset the Demo
+## 12. Reset the Demo
 
 Tap **Reset demo** in the header to clear local statements, transactions, settings, and learned rules back to the starter state.
 
-## 12. Safety Notes
+## 13. Safety Notes
 
 - Review tax-sensitive categories before relying on them.
 - Do not treat automated deductibility labels as professional tax advice.

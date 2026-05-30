@@ -11,7 +11,8 @@ A working mobile-first PWA MVP for turning uploaded statement PDFs and parser ou
 - **Review queue:** ambiguous, low-confidence, or tax-sensitive transactions appear in a mobile-friendly review flow.
 - **Learning from input:** user corrections can create approved merchant rules, and future matching transactions use those rules before inference.
 - **Spending dashboard:** view total spend, business spend, personal spend, review count, and top category bars.
-- **Portable mobile front end:** responsive PWA shell with a manifest, service worker, large tap targets, bottom navigation, and local persistence.
+- **Portable mobile front end:** responsive PWA shell with a manifest, service worker, large tap targets, bottom navigation, local persistence, and a guided mobile install/setup wizard.
+- **Connection wizard:** setup flow for installing to Android/iOS, recording the Google Drive statement folder, connecting parser webhooks, and routing LLM categorisation through automation.
 
 
 ## Beginner Manual
@@ -21,6 +22,18 @@ If you are new to the app, start with the step-by-step beginner guide:
 - [Beginner Manual](docs/BEGINNER_MANUAL.md)
 
 The manual explains how to run the app, load sample data, upload PDFs, connect a parser webhook, import CSV rows, review transactions, create learned rules, and troubleshoot common issues.
+
+
+## Mobile Standalone Install
+
+The app is designed to be installed as a standalone PWA on Android or iOS. A browser must open the app once from a local/static server or hosted URL so the browser can install and cache it; after that, the app shell launches from the phone home screen without needing the original server to stay online. Internet is still required when you upload PDFs to a parser webhook, open Google Drive, or call external AI/automation services.
+
+1. Start or publish the static app.
+2. Open it on the phone in Chrome on Android or Safari on iOS.
+3. Use the **Setup** tab or **Install app** button.
+4. Android: tap **Install app** or browser menu → **Add to Home screen**.
+5. iOS: tap Share → **Add to Home Screen**.
+6. Reopen **Bookkeeping AI** from the home screen and complete the Google Drive, parser, and LLM connection checklist.
 
 ## Run Locally
 
@@ -38,7 +51,7 @@ No build step is required because the MVP is plain HTML, CSS, and JavaScript mod
 npm test
 ```
 
-The tests cover categorisation, CSV parsing, quoted merchant fields, parser header aliases, multiple currency and debit/credit amount formats, US and day-first dates, duplicate detection, exact/contains/regex rules, spending summaries, rule creation, and PWA static asset wiring.
+The tests cover categorisation, CSV parsing, quoted merchant fields, parser header aliases, multiple currency and debit/credit amount formats, US and day-first dates, duplicate detection, exact/contains/regex rules, spending summaries, rule creation, PWA static asset wiring, mobile install metadata, and the setup wizard fields for Google/parser/LLM connections.
 
 ## Product Flow
 

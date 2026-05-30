@@ -27,12 +27,18 @@ const emptyState = () => ({
   transactions: [],
   rules: DEFAULT_RULES,
   settings: {
+    googleAccountEmail: "",
+    driveFolderUrl: "",
+    parserProvider: "Parseur",
     webhookUrl: "",
-    llmProvider: ""
+    llmProvider: "OpenAI via automation",
+    llmRouteNote: "",
+    installedHintSeen: false
   }
 });
 
 let state = loadState();
+let deferredInstallPrompt = null;
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -53,6 +59,41 @@ function saveState() {
 function showPanel(name) {
   $$(".panel").forEach((panel) => panel.classList.toggle("active", panel.dataset.panel === name));
   $$(".bottom-nav button").forEach((button) => button.classList.toggle("active", button.dataset.target === name));
+}
+
+function isStandaloneMode() {
+  return window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true;
+}
+
+function connectionSteps() {
+  return [
+    {
+      key: "install",
+      title: "Standalone app",
+      ready: isStandaloneMode() || state.settings.installedHintSeen,
+      detail: isStandaloneMode()
+        ? "Running from the installed app shell."
+        : "Install from Android Chrome or iOS Safari, then open from the home screen."
+    },
+    {
+      key: "google",
+      title: "Google Drive folder",
+      ready: Boolean(state.settings.googleAccountEmail && state.settings.driveFolderUrl),
+      detail: state.settings.driveFolderUrl || "Add the Google account email and Drive folder URL used for statement PDFs."
+    },
+    {
+      key: "parser",
+      title: "Parser webhook",
+      ready: Boolean(state.settings.webhookUrl),
+      detail: state.settings.webhookUrl || "Paste the Make/Zapier webhook that forwards PDFs to Parseur, Nanonets, or OCR."
+    },
+    {
+      key: "llm",
+      title: "AI categorisation route",
+      ready: Boolean(state.settings.llmProvider),
+      detail: state.settings.llmProvider || "Choose the LLM route your automation will use."
+    }
+  ];
 }
 
 function formatDateTime(value) {
@@ -177,13 +218,82 @@ function renderRules() {
     : `<p class="empty-state">No rules yet. Correct transactions to teach the assistant.</p>`;
 }
 
-function renderSettings() {
+function renderSetup() {
+  $("#googleAccountEmail").value = state.settings.googleAccountEmail || "";
+  $("#driveFolderUrl").value = state.settings.driveFolderUrl || "";
+  $("#parserProvider").value = state.settings.parserProvider || "Parseur";
   $("#webhookUrl").value = state.settings.webhookUrl || "";
-  $("#llmProvider").value = state.settings.llmProvider || "";
+  $("#llmProvider").value = state.settings.llmProvider || "OpenAI via automation";
+  $("#llmRouteNote").value = state.settings.llmRouteNote || "";
+
+  const online = navigator.onLine;
+  $("#networkStatus").textContent = online ? "Online: services available" : "Offline: app shell only";
+  $("#networkStatus").classList.toggle("warn", !online);
+  $("#installAppButton").textContent = isStandaloneMode() ? "Installed" : "Install app";
+
+  const steps = connectionSteps();
+  const readyCount = steps.filter((step) => step.ready).length;
+  $("#setupProgress").textContent = `${readyCount}/${steps.length} ready`;
+  $("#connectionChecklist").innerHTML = steps
+    .map(
+      (step) => `<div class="check-item">
+        <div>
+          <strong>${step.title}</strong>
+          <span>${step.detail}</span>
+        </div>
+        <i class="status-dot ${step.ready ? "ready" : "blocked"}" aria-label="${step.ready ? "Ready" : "Needs setup"}"></i>
+      </div>`
+    )
+    .join("");
+}
+
+function renderSettings() {
+  const steps = connectionSteps();
+  const readyCount = steps.filter((step) => step.ready).length;
   $("#syncStatus").textContent = state.settings.webhookUrl ? "Webhook ready" : "Local-first MVP";
+  $("#connectionSummary").innerHTML = steps
+    .map(
+      (step) => `<div class="connection-row">
+        <div>
+          <strong>${step.title}</strong>
+          <span>${step.detail}</span>
+        </div>
+        <i class="status-dot ${step.ready ? "ready" : "blocked"}" aria-label="${step.ready ? "Ready" : "Needs setup"}"></i>
+      </div>`
+    )
+    .join("");
+  $("#syncStatus").textContent = `${readyCount}/${steps.length} connected`;
+}
+
+function saveConnectionSettings() {
+  state.settings.googleAccountEmail = $("#googleAccountEmail").value.trim();
+  state.settings.driveFolderUrl = $("#driveFolderUrl").value.trim();
+  state.settings.parserProvider = $("#parserProvider").value;
+  state.settings.webhookUrl = $("#webhookUrl").value.trim();
+  state.settings.llmProvider = $("#llmProvider").value;
+  state.settings.llmRouteNote = $("#llmRouteNote").value.trim();
+  saveState();
+  renderAll();
+}
+
+async function installApp() {
+  state.settings.installedHintSeen = true;
+  saveState();
+
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice.catch(() => undefined);
+    deferredInstallPrompt = null;
+  } else {
+    $("#installInstructions").scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  renderAll();
+  showPanel("setup");
 }
 
 function renderAll() {
+  renderSetup();
   renderDashboard();
   renderStatements();
   renderReview();
@@ -197,6 +307,10 @@ async function forwardPdfToWebhook(statement, file) {
   body.append("statement", file);
   body.append("statementId", statement.id);
   body.append("uploadedAt", statement.uploadedAt);
+  body.append("googleAccountEmail", state.settings.googleAccountEmail || "");
+  body.append("driveFolderUrl", state.settings.driveFolderUrl || "");
+  body.append("parserProvider", state.settings.parserProvider || "");
+  body.append("llmProvider", state.settings.llmProvider || "");
 
   const response = await fetch(state.settings.webhookUrl, { method: "POST", body });
   if (!response.ok) throw new Error(`Webhook returned ${response.status}`);
@@ -316,12 +430,17 @@ function attachEvents() {
   $("#importRowsButton").addEventListener("click", importRows);
   $("#approveAllButton").addEventListener("click", approveHighConfidence);
   $("#addRuleButton").addEventListener("click", addManualRule);
-  $("#saveSettingsButton").addEventListener("click", () => {
-    state.settings.webhookUrl = $("#webhookUrl").value.trim();
-    state.settings.llmProvider = $("#llmProvider").value.trim();
-    saveState();
-    renderAll();
+  $("#installAppButton").addEventListener("click", installApp);
+  $("#installGuideButton").addEventListener("click", installApp);
+  $("#saveSetupButton").addEventListener("click", saveConnectionSettings);
+  $("#saveSettingsButton").addEventListener("click", saveConnectionSettings);
+  $("#openSetupButton").addEventListener("click", () => showPanel("setup"));
+  $("#goToUploadButton").addEventListener("click", () => {
+    saveConnectionSettings();
+    showPanel("inbox");
   });
+  window.addEventListener("online", renderAll);
+  window.addEventListener("offline", renderAll);
   $("#resetDemoButton").addEventListener("click", () => {
     state = emptyState();
     saveState();
@@ -345,6 +464,19 @@ function attachEvents() {
     if (reviewedButton) updateTransactionFromCard(reviewedButton.closest(".transaction-card"), true);
   });
 }
+
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  renderAll();
+});
+
+window.addEventListener("appinstalled", () => {
+  state.settings.installedHintSeen = true;
+  deferredInstallPrompt = null;
+  saveState();
+  renderAll();
+});
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {

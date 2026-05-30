@@ -342,7 +342,7 @@ small,
   inset: auto 0 0;
   z-index: 20;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   gap: 0.25rem;
   padding: 0.5rem max(0.5rem, env(safe-area-inset-left)) max(0.5rem, env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-right));
   background: rgba(15, 23, 42, 0.94);
@@ -411,4 +411,127 @@ small,
     border-radius: 28px;
     box-shadow: var(--shadow);
   }
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: flex-end;
+}
+
+.setup-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.setup-card {
+  position: relative;
+  padding-top: 1.25rem;
+}
+
+.step-number {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 0.6rem;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-weight: 900;
+}
+
+.helper-list {
+  margin: 0.85rem 0 0;
+  padding-left: 1.25rem;
+  color: var(--muted);
+}
+
+.secondary-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  border-radius: 16px;
+  padding: 0.8rem 1rem;
+  background: #e2e8f0;
+  color: var(--ink);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.secondary-link:hover {
+  background: #cbd5e1;
+}
+
+.checklist,
+.connection-summary {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0.85rem 0;
+}
+
+.check-item,
+.connection-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-soft);
+}
+
+.check-item strong,
+.connection-row strong {
+  display: block;
+}
+
+.check-item span,
+.connection-row span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.status-dot {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  margin-top: 0.25rem;
+  border-radius: 999px;
+  background: #f59e0b;
+  box-shadow: 0 0 0 4px #fef3c7;
+}
+
+.status-dot.ready {
+  background: #16a34a;
+  box-shadow: 0 0 0 4px #dcfce7;
+}
+
+.status-dot.blocked {
+  background: #dc2626;
+  box-shadow: 0 0 0 4px #fee2e2;
+}
+
+@media (max-width: 780px) {
+  .hero-actions {
+    justify-content: stretch;
+  }
+
+  .hero-actions button,
+  .secondary-link {
+    width: 100%;
+  }
+
+  .setup-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pill.warn {
+  background: #fef3c7;
+  color: #92400e;
 }
